@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+  
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+</head>
+<body>
+<nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="">Syllabus Calendar</a>
+    </div>
+     <ul class="nav navbar-nav">
+      <li><a href="#"> CSE437S Software Engineering Workshop</a></li>
+    </ul>
+	<ul class="nav navbar-nav navbar-right">
+	  <li><a href="#"><span class="glyphicon glyphicon-home"></span> Washington University in St Louis</a></li>
+      <li><a href="#"><span class="glyphicon glyphicon-user"></span> My Profile</a></li>
+      <li><a href="http://localhost:8000/"><span class="glyphicon glyphicon-log-in"></span> Log Out</a></li>
+    </ul>
+  </div>
+</nav>
+<!-- three tabs -->
+<div class="container" ng-app="courseApp" ng-controller="CourseCtrl">
+  <ul class="nav nav-tabs">
+    <li class="active"><a data-toggle="tab" href="#home">Home</a></li>
+    <li ng-show="user.Access !== '0'"><a data-toggle="tab" href="#member">Members</a></li>
+    <li><a data-toggle="tab" href="#history">History</a></li>
+  </ul>
+
+  <div class="tab-content">
+<!--   	the home tabl  -->
+    <div id="home" class="tab-pane fade in active">
+      <div class="panel panel-default">
+		<div class="panel-heading">
+			<div>
+				Exams
+			</div>
+			<button ng-show="user.Access !== '0'" ng-click="addExam()" style="float:right;margin-top:-20px">
+				New Exam
+			</button>
+		</div>
+		<div class="panel-body">
+			<table class="form-group exam-table">
+				<tr class="row">
+					<th class="col-md-2">Type</th>
+					<th class="col-md-1">Order</th>
+					<th class="col-md-3">Date and Time</th>
+					<th class="col-md-2">Location</th>
+					<th class="col-md-2">Description</th>
+					<th class="col-md-2" ng-show="user.Access !== '0'">Action</th>
+				</tr>
+				<tr class="row" ng-repeat="x in course.exams">
+					<td> 
+						<select class="form-control" ng-model="x.Type" disabled>
+			  				<option value="0">Quiz</option>
+			  				<option value="1">Midterm</option>
+			  				<option value="2">Final</option>
+						</select>
+					</td>
+					<td>
+						{{!x.Order}}
+
+					</td>
+					<td>
+						<div ng-hide="x.Mode">
+							{{!x.Date}} {{!x.StartTime}} - {{!x.EndTime}}
+						</div>
+						<div ng-show="x.Mode">
+							<input ng-model="x.Date">
+							<input ng-model="x.StartTime"> -
+							<input ng-model="x.EndTime">
+						</div>
+					</td>
+					<td>
+						<div ng-hide="x.Mode">
+							{{!x.Location}}
+						</div>
+						<div ng-show="x.Mode">
+							<input ng-model="x.Location">
+						</div>
+					</td>
+					<td>
+						<div ng-hide="x.Mode">
+							{{!x.Description}}
+						</div>
+						<div ng-show="x.Mode">
+							<input ng-model="x.Description">
+						</div>
+					</td>
+					<td ng-show="user.Access !== '0'">
+						<button ng-click="removeExam(x)">Remove</button>
+						<button ng-click="openEdit(x)" ng-hide="x.Mode">Edit</button>
+						<button ng-click="saveExam(x)" ng-show="x.Mode">Save</button>
+					</td>
+				</tr>
+				<!-- add new exam -->
+				<tr class="row" ng-show="newExam.show">
+					<td> 
+						<select class="form-control" ng-model="newExam.Type">
+			  				<option value="0">Quiz</option>
+			  				<option value="1">Midterm</option>
+			  				<option value="2">Final</option>
+						</select>
+					</td>
+					<td>
+						<input ng-model="newExam.Order">
+					</td>
+					<td>
+						<div>
+							<input ng-model="newExam.Date">
+							<input ng-model="newExam.StartTime"> -
+							<input ng-model="newExam.EndTime">
+						</div>
+					</td>
+					<td>
+						<div>
+							<input ng-model="newExam.Location">
+						</div>
+					</td>
+					<td>
+						<div>
+							<input ng-model="newExam.Description">
+						</div>
+					</td>
+					<td ng-show="user.Access !== '0'">
+						<button ng-click="saveNewExam()">Save</button>
+					</td>
+				</tr>
+			</table>
+		</div>
+		</div>
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<div>
+					Assignments
+				</div>
+				<button ng-show="user.Access !== '0'" ng-click="addAssign()" style="float:right;margin-top:-20px">
+					Add Assignments
+				</button>
+			</div>
+			<div class="panel-body">
+				<table class="form-group assign-table">
+					<tr class="row">
+						<th class="col-md-3">Type</th>
+						<th class="col-md-1">Order</th>
+						<th class="col-md-3">Due</th>
+						<th class="col-md-3">Description</th>
+						<th class="col-md-2" ng-show="user.Access !== '0'">Action</th>
+					</tr>
+					<tr class="row" ng-repeat="x in course.assignments">
+						<td > 
+							<select class="form-control" value="{{!x.Type}}" disabled>
+				  				<option value="0">Lab</option>
+				  				<option value="1">Studio</option>
+				  				<option value="2">Essay</option>
+							</select>
+						</td>
+						<td>
+							{{!x.Order}}
+						</td>
+						<td>
+		  					<div ng-hide="x.Mode">
+								{{!x.Due}}
+							</div>
+							<div ng-show="x.Mode">
+								<input ng-model="x.Due">
+							</div>
+						</td>
+						<td>
+							<div ng-hide="x.Mode">
+								{{!x.Description}}
+							</div>
+							<div ng-show="x.Mode">
+								<input ng-model="x.Description">
+							</div>
+						</td>
+							<td ng-show="user.Access !== '0'">
+							<button ng-click="removeAssign(x)">Remove</button>
+							<button ng-click="openEdit(x)" ng-hide="x.Mode">Edit</button>
+							<button ng-click="saveAssign(x)" ng-show="x.Mode">Save</button>
+						</td>
+
+					</tr>
+					<!-- add new assignments -->
+					<tr class="row" ng-show="newAssign.show">
+						<td> 
+							<select class="form-control" ng-model="newAssign.Type">
+				  				<option value="0">Lab</option>
+				  				<option value="1">Studio</option>
+				  				<option value="2">Essay</option>
+							</select>
+						</td>
+						<td>
+							<input ng-model="newAssign.Order">
+						</td>
+						<td>
+							<div>
+								<input ng-model="newAssign.Due">
+							</div>
+						</td>
+						<td>
+							<div>
+								<input ng-model="newAssign.Description">
+							</div>
+						</td>
+						<td ng-show="user.Access !== '0'">
+							<button ng-click="saveNewAssign()">Save</button>
+						</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+		<button ng-click="saveChange()" class="btn btn-bg btn-primary" style="margin-left:40%; "  ng-show="user.Access !== '0'">
+			Save Changes
+		</button>
+    </div>
+<!--     the member tab -->
+    <div id="member" class="tab-pane fade">
+      <div class="panel panel-default">
+			<div class="panel-heading">Member</div>
+			<div class="panel-body">
+				<table class="form-group assign-table" >
+					<tr class="row">
+						<th class="col-md-3">First Name</th>
+						<th class="col-md-3">Last Name</th>
+						<th class="col-md-3">Email</th>
+						<th class="col-md-2">Access</th>
+					</tr>
+					<tr class="row" ng-repeat="x in course.members">
+						<td>
+							{{!x.FirstName}}
+						</td>
+						<td>
+							{{!x.LastName}}
+						</td>
+						<td>
+		  					{{!x.Email}}
+						</td>
+						<td>
+							<div ng-show="x.Access=='1'&&user.Access=='2'">
+								<button ng-click="removeAdmin(x)">Remove Admin</button>
+							</div>
+							<div ng-show="x.Access=='0'&&user.Access!=='0'">
+								<button ng-click="giveAdmin(x)">Give Admin</button>
+							</div>
+						</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+    </div>
+  <!--   the history tab -->
+    <div id="history" class="tab-pane fade">
+      <div class="panel panel-default">
+			<div class="panel-heading">History</div>
+			<div class="panel-body">
+				<table class="form-group assign-table">
+					<tr class="row">
+						<th class="col-md-3">Time</th>
+						<th class="col-md-3">User</th>
+						<th class="col-md-2">Description</th>
+					</tr>
+					<tr class="row" ng-repeat="x in course.history" >
+						<td> 
+							{{!x.DateTime}}
+						</td>
+						<td>
+		  					{{!x.User}}
+						</td>
+						<td>
+							{{!x.Description}}
+						</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+    </div>
+  </div>
+</div>
+
+<script>
+var courseApp = angular.module("courseApp", []);
+courseApp.controller("CourseCtrl", function($scope,$http) {
+
+	$scope.user = {
+		userid:sessionStorage.userid,
+		Access:sessionStorage.access,
+		Firstname:sessionStorage.firstname,
+		Lastname:sessionStorage.lastname
+	}
+
+	$scope.course = {
+		exams:[{
+			'Type': '0',           //0(quiz), 1(midterm), 2(final)
+			'Description': "It's just a quiz",
+			'Order':'1',
+			'Date': '12/05/16',
+			'StartTime': '10:30 AM',
+			'EndTime' : '11:30 AM',
+			'Location': 'Eads	016',
+			'Mode':false //false - view, true - edit, back end can ignore this 
+		}],
+		assignments:[{
+			'Type': '0',                 //0(lab), 1(studio), 2(essay)
+			'Description' : "It's just a lab",
+			'Order':'1',
+			'Due': '12/04/16',
+			'Mode':false  //false - view, true - edit, back end can ignore this 
+		}],
+		members:[],
+		history:[{
+			'DateTime':"2016/12/03 7:31PM",
+			'User':"Ran Wan",
+			'Description':"Create the course"
+		}]
+	}
+
+	//get the list of member
+	var name = {
+		'className':sessionStorage.className
+	}
+	$http.put('http://localhost:8000/class/fetch', name)
+        .then(
+          //login success
+          function(response){
+                if (response.data.result == "success"){
+                	if (response.data.count == 1){
+                		var member = response.data.data[0];
+                		$scope.course.members.push({'Email':member[0],'FirstName':member[1],'LastName':member[2],Access:member[3]});
+                	}else if (response.data.count > 1){
+                	
+                		for (var i = 0; i < response.data.count; i++){
+                			var member = response.data.data[i];
+                			$scope.course.members.push({'Email':member[0],'FirstName':member[1],'LastName':member[2],Access:member[3]});
+                		}
+                	}
+                }else {
+                   alert(response.data.reason);
+                }
+          },
+          //login fail
+          function(){
+            alert("send failure");
+          }
+      	);
+
+     $scope.saveChange = function(){
+     	$http.get('http://localhost:8000/flag/1')
+     	.then(
+     		function(response){
+     			console.log(response.data);
+     			if (response.data.result == "success"){
+     				alert(response.data.url);
+     			}
+     		},
+     		function(){
+     			alert("Save Failure!")
+     		}
+     		);
+     }
+
+
+	var examType =["Quiz","Midterm","Final"];
+	var assignmentType= ["Lab","Studio","Essay"];
+
+	$scope.removeExam= function(x){
+		var index = -1;     
+		
+	    var comArr = eval( $scope.course.exams );
+	    for( var i = 0; i < comArr.length; i++ ) {
+	        if( comArr[i].Type === x.Type && comArr[i].Order === x.Order) {
+	            index = i;
+	            break;
+	        }
+	    }
+	    if( index === -1 ) {
+	        alert( "Something gone wrong" );
+	    }
+	    $scope.course.exams.splice( index, 1 ); 
+
+	    var currentdate = new Date(); 
+		var datetime = currentdate.getFullYear()+ "/"
+				+ (currentdate.getMonth()+1) + "/"  
+				+ currentdate.getDate() + " "
+                
+                + currentdate.getHours() + ":"  
+                + currentdate.getMinutes();
+
+        var fullName= $scope.user.Firstname+" "+$scope.user.Lastname;
+        var descr = "Remove "+ examType[parseInt(x.Type)]+x.Order;
+
+		$scope.course.history.push({'DateTime': datetime,'User': fullName, 'Description':descr});
+	}
+
+	$scope.removeAssign= function(x){
+		var index = -1;     
+		
+	    var comArr = eval( $scope.course.assignments );
+	    for( var i = 0; i < comArr.length; i++ ) {
+	        if( comArr[i].Type === x.Type && comArr[i].Order === x.Order) {
+	            index = i;
+	            break;
+	        }
+	    }
+	    if( index === -1 ) {
+	        alert( "Something gone wrong" );
+	    }
+	    $scope.course.assignments.splice( index, 1 ); 
+
+	    var currentdate = new Date(); 
+		var datetime = currentdate.getFullYear()+ "/"
+				+ (currentdate.getMonth()+1) + "/"  
+				+ currentdate.getDate() + " "
+                
+                + currentdate.getHours() + ":"  
+                + currentdate.getMinutes();
+
+        var fullName= $scope.user.Firstname+" "+$scope.user.Lastname;
+        var descr = "Remove "+ assignmentType[parseInt(x.Type)]+x.Order;
+
+		$scope.course.history.push({'DateTime': datetime,'User': fullName, 'Description':descr});
+	}
+
+	$scope.openEdit= function(x){
+		x.Mode = true;
+	}
+
+// save the modified exam and assignments
+	$scope.saveExam= function(x){
+		x.Mode = false;
+		var currentdate = new Date(); 
+		var datetime = currentdate.getFullYear()+ "/"
+				+ currentdate.getDate() + "/"
+                + (currentdate.getMonth()+1) + " "  
+                + currentdate.getHours() + ":"  
+                + currentdate.getMinutes();
+
+        var fullName= $scope.user.Firstname+" "+$scope.user.Lastname;
+        var descr = "Modify "+ examType[parseInt(x.Type)]+x.Order;
+
+		$scope.course.history.push({'DateTime': datetime,'User': fullName, 'Description':descr});
+
+	}
+
+	$scope.saveAssign= function(x){
+		x.Mode = false;
+		var currentdate = new Date(); 
+		var datetime = currentdate.getFullYear()+ "/"
+				+ currentdate.getDate() + "/"
+                + (currentdate.getMonth()+1) + " "  
+                + currentdate.getHours() + ":"  
+                + currentdate.getMinutes();
+
+        var fullName= $scope.user.Firstname+" "+$scope.user.Lastname;
+        var descr = "Modify "+ assignmentType[parseInt(x.Type)]+x.Order;
+
+		$scope.course.history.push({'DateTime': datetime,'User': fullName, 'Description':descr});
+
+	}
+
+	$scope.removeAdmin = function(x){
+		data = {
+			'userid':$scope.user.userid,
+			'target':x.Email,
+			'className': "Software Engineering Workshop",
+			'action':'0' //remove admin
+		}
+		x.Access = "0";
+		$http.post('http://localhost:8000/user/update', data)
+        .then(
+          //login success
+          function(response){
+                console.log(response.data);
+                if (response.data.result == "success"){
+                   alert(response.data.data);
+                }else {
+                    alert(response.data.reason);
+                }
+          },
+          //login fail
+          function(){
+            alert("send failure");
+          }
+      	);
+
+	}
+	$scope.giveAdmin = function(x){
+		data = {
+			'userid':$scope.user.userid,
+			'target':x.Email,
+			'className':"Software Engineering Workshop",
+			'action':'1' //give Admin
+		}
+		x.Access = "1";
+		$http.post('http://localhost:8000/user/update', data)
+        .then(
+          //login success
+          function(response){
+                console.log(response.data);
+                if (response.data.result == "success"){
+                    console.log(response.data.data);
+                }else {
+                    alert(response.data.reason);
+                }
+          },
+          //login fail
+          function(){
+            alert("send failure");
+          }
+      	);
+	}
+
+	$scope.newExam={
+		'show':false,
+		'Type': '',           //0(quiz), 1(midterm), 2(final)
+		'Description': "",
+		'Order':'',
+		'Date': '',
+		'StartTime': '',
+		'EndTime' : '',
+		'Location': '',
+		'Mode':false //false - view, true - edit, back end can ignore this 
+
+	}
+
+	$scope.newAssign= {
+		'show':false,
+		'Type': '',           //0(quiz), 1(midterm), 2(final)
+		'Description': "",
+		'Order':'',
+		'Due':'',
+		'Mode':false //false - view, true - edit, back end can ignore this 
+
+	}
+
+	$scope.addExam=function(){
+		$scope.newExam.show = true;
+	}
+	$scope.saveNewExam = function(){
+		$scope.newExam.show = false;
+		$scope.course.exams.push({'Type': $scope.newExam.Type,'Description': $scope.newExam.Description,'Order':$scope.newExam.Order,'Date':$scope.newExam.Date,'StartTime':$scope.newExam.StartTime,'EndTime':$scope.newExam.EndTime,'Location':$scope.newExam.Location,'Mode':false});
+		var currentdate = new Date(); 
+		var datetime = currentdate.getFullYear()+ "/"
+				+ currentdate.getDate() + "/"
+                + (currentdate.getMonth()+1) + " "  
+                + currentdate.getHours() + ":"  
+                + currentdate.getMinutes();
+
+        var fullName= $scope.user.Firstname+" "+$scope.user.Lastname;
+        var descr = "Add "+ examType[parseInt($scope.newExam.Type)]+$scope.newExam.Order;
+
+		$scope.course.history.push({'DateTime': datetime,'User': fullName, 'Description':descr});
+
+	}
+
+	$scope.addAssign=function(){
+		$scope.newAssign.show = true;
+	}
+	$scope.saveNewAssign = function(){
+		$scope.newAssign.show = false;
+		$scope.course.assignments.push({'Type': $scope.newAssign.Type,'Description': $scope.newAssign.Description,'Order':$scope.newAssign.Order,'Due':$scope.newAssign.Due,'Mode':false});
+		var currentdate = new Date(); 
+		var datetime = currentdate.getFullYear()+ "/"
+				+ currentdate.getDate() + "/"
+                + (currentdate.getMonth()+1) + " "  
+                + currentdate.getHours() + ":"  
+                + currentdate.getMinutes();
+
+        var fullName= $scope.user.Firstname+" "+$scope.user.Lastname;
+        var descr = "Add "+ assignmentType[parseInt($scope.newAssign.Type)]+$scope.newAssign.Order;
+
+		$scope.course.history.push({'DateTime': datetime,'User': fullName, 'Description':descr});
+	}
+	
+
+	
+
+		
+
+
+});
+</script>
+</body>
+</html>

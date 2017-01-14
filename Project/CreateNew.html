@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+
+<!-- HTML5 Hello world by kirupa - http://www.kirupa.com/html5/getting_your_feet_wet_html5_pg1.htm -->
+<html lang="en-us">
+
+<head>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+</head>
+<body ng-app="myApp" ng-controller="mainController">
+<nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="">Syllabus Calendar</a>
+    </div>
+  <ul class="nav navbar-nav navbar-right">
+    <li><a href="#"><span class="glyphicon glyphicon-home"></span> Washington University in St Louis</a></li>
+      <li><a href="#"><span class="glyphicon glyphicon-user"></span> My Profile</a></li>
+      <li><a href="http://localhost:8000/"><span class="glyphicon glyphicon-log-in"></span> Log Out</a></li>
+    </ul>
+  </div>
+</nav>
+<ul class="nav nav-tabs  nav-justified">
+      <li class="active"><a data-toggle="tab" href="#home3">Class Information</a></li>
+      <li ><a data-toggle="tab" href="#home">Exams</a></li>
+      <li><a data-toggle="tab" href="#home2">Assignments</a></li>
+    </ul>
+<div class="tab-content">
+<div id="home" class="tab-pane fade in panel panel-default">
+  <div class="panel-heading">Exams</div>
+  <div class="panel-body">
+            <table class="table">
+              <tr>
+                <th>Type
+                </th>
+                    <th>Order
+                    </th>
+                <th>Date
+                </th>
+                <th>Start Time
+                </th>
+                <th>End Time
+                </th>
+                <th>Location
+                </th>
+                <th>
+                  Description
+                </th>
+                <th>
+                  Action
+                </th>
+              </tr>
+              <tr ng-repeat="exam in course.exams">
+                <td>{{!exam.examType}}
+                </td>
+                    <td>{{!exam.order}}
+                    </td>
+                <td>{{!exam.date | date :  "MM/dd/yyyy" }}
+                </td>
+                <td>{{!exam.startTime | date :  "hh:mm a" }}
+                </td>
+                <td>{{!exam.endTime  | date :  "hh:mm a" }}
+                </td>
+                <td>{{!exam.examlocation}}
+                </td>
+                <td>{{!exam.description}}
+                </td>
+                <td>
+                  <button ng-click="removeExam(exam.date)">
+                    <span class="glyphicon glyphicon-remove remove-assign"></span>
+                  </button>
+                </td>
+              </tr>
+               <!--adding new row-->
+              <tr>
+                <td>  
+                <select class="form-control" name="examType" ng-model="newExam.examType" required>
+                  <option value=''>Select</option>
+                  <option value="Quiz">Quiz</option>
+                <option value="Midterm">Midterm</option>
+                <option value="Final">Final</option>
+            </select>
+                </td>
+                    <td>
+                        <input type="number" class="form-control" name="order" ng-model="newExam.order">
+                    </td>
+                <td>
+                  <input type="date" class="form-control" name="date"
+                ng-model="newExam.date" />
+                </td>
+                <td>
+                  <input type="time" class="form-control" name="startTime"
+                ng-model="newExam.startTime" />
+                </td>
+                <td>
+                  <input type="time" class="form-control" name="endTime"
+                ng-model="newExam.endTime" />
+                </td>
+                <td><input type="text" class="form-control" name="examlocation"
+                ng-model="newExam.examlocation" />
+                </td>
+                <td>
+                  <input type="text" class="form-control" name="description"
+                ng-model="newExam.description" />
+                </td>
+                <td>
+                  <input type="button" value="Add" class="btn btn-primary" ng-click="addExam()"/>
+                </td>
+              </tr>
+            </table>
+  </div>
+</div>
+<div id="home2" class="tab-pane fade panel panel-default">
+  <div class="panel-heading">Assignment</div>
+  <div class="panel-body">
+            <table class="table">
+              <tr>
+                <th>Type
+                </th>
+                    <th>Order
+                    </th>
+                <th>Date
+                </th>
+                <th>Description
+                </th>
+                <th>Action
+                </th>
+              </tr>
+              <tr ng-repeat="assignment in course.assignments">
+                <td>{{!assignment.assignmentType}}
+                </td>
+                    <td>{{!assignment.order}}
+                    </td>
+                <td>{{!assignment.date | date :  "MM/dd/yyyy hh:mm a" }}
+                </td>
+                <td>{{!assignment.description}}
+                </td>
+                <td>
+                  <button ng-click="removeAssign(assignment.date)">
+                    <span class="glyphicon glyphicon-remove remove-assign"></span>
+                  </button>
+                </td>
+              </tr>
+              <tr>
+                <td>  
+                <select class="form-control" assignmentType="assignmentType" ng-model="newAssign.assignmentType">
+                  <option value=''>Select</option>
+                  <option value="Homework">Homework</option>
+                <option value="Paper">Paper</option>
+                <option value="Lab">Lab</option>
+                <option value="Project">Project</option>
+            </select>
+                </td>
+                    <td>
+                        <input type="number" class="form-control" name="order" ng-model="newAssign.order">
+                    </td>
+                <td>
+                  <input type="datetime-local" class="form-control" name="date"
+                ng-model="newAssign.date" />
+                </td>
+                <td>
+                  <input type="text" class="form-control" name="description"
+                ng-model="newAssign.description" />
+                </td>
+                <td>
+                  <input type="button" value="Add" class="btn btn-primary" ng-click="addAssign()"/>
+                </td>
+              </tr>
+            </table>
+  </div>
+</div>
+<div id="home3" class="tab-pane fade in active panel panel-default">
+  <div class="panel-heading">Enter Class Information</div>
+  <div class="panel-body">
+  <form name="userForm"  ng-submit="submitForm()" novalidate>
+    
+    <div class="form-group" ng-class="{ 'has-error' : userForm.type.$invalid && (userForm.type.$dirty || submitted)}">
+         <label>Your Role:</label>
+         <select name="type" class="form-control"
+         ng-model="course.isProf"
+         ng-options="type.TypeId as type.Name for type in typeList"
+         ng-required="true">
+         <option value=''>Select</option>
+         </select>
+        </div>
+        
+        <div class="form-group" ng-class="{ 'has-error' : (userForm.classNumber.$invalid && (userForm.classNumber.$dirty || submitted)) 
+        || (userForm.className.$invalid && (userForm.last.$dirty || submitted)) 
+        || (userForm.sectionnumber.$invalid && (userForm.sectionnumber.$dirty || submitted))
+        || (userForm.instructor.$invalid && (userForm.instructor.$dirty || submitted)) }">
+         <label>Course Number:</label>
+         <input type="text" name="classNumber" class="form-control" ng-model="course.classNumber" placeholder="" ng-required="true">
+        <label>Course Title:</label>
+         <input type="text" name="className" class="form-control" ng-model="course.className" placeholder="" ng-required="true">
+  <!--        <label>Section Number:</label>
+         <input type="text" name="sectionnumber" class="form-control" ng-model="course.sectionnumber" placeholder=""> -->
+         <label>Instructor Name:</label>
+         <input type="text" name="instructor" class="form-control" ng-model="course.instructor" placeholder="">
+         <p ng-show="(userForm.classNumber.$error.required && (userForm.classNumber.$dirty || submitted))||(userForm.className.$error.required && (userForm.className.$dirty || submitted))" class="help-block">Required.</p>
+                    <label>Start Date:</label>
+           <input type="date" class="form-control" name="date"
+                ng-model="course.startDate" />
+            <label>End Date:</label>
+           <input type="date" class="form-control" name="date"
+                ng-model="course.EndDate" />
+         </div>
+         <div>
+          <label>Lecture Times:</label>
+          
+            <table class="table">
+              <tr>
+                <th>Type
+                </th>
+                <th>Start Time
+                </th>
+                <th>End Time
+                </th>
+                <th>
+                  Location
+                </th>
+                <th>Action
+                </th>
+              </tr>
+              <tr ng-repeat="time in course.times">
+                <td>{{!time.day}}
+                </td>
+                <td>{{!time.startTime | date :  "hh:mm a" }}
+                </td>
+                <td>{{!time.endTime  | date :  "hh:mm a" }}
+                </td>
+                <td>
+                  {{!time.location}}
+                </td>
+                <td>
+                  <button ng-click="removeDay(time.day)">
+                    <span class="glyphicon glyphicon-remove remove-assign"></span>
+                  </button>
+                </td>
+              </tr>
+            
+              <tr>
+                <td>  
+                <select class="form-control" name="day" ng-model="newTime.day">
+                  <option value=''>Select</option>
+                  <option value="M">M</option>
+                <option value="T">T</option>
+                <option value="W">W</option>
+                <option value="R">R</option>
+                <option value="F">F</option>
+            </select>
+                </td>
+                <td>
+                  <input type="time" class="form-control" name="startTime"
+                ng-model="newTime.startTime" />
+                </td>
+                <td>
+                  <input type="time" class="form-control" name="endTime"
+                ng-model="newTime.endTime" />
+                </td>
+                <td>
+                  <input type="text" class="form-control" name="location"
+                ng-model="newTime.location" />
+                </td>
+                <td>
+                  <input type="button" value="add" class="btn btn-primary" ng-click="addDay()"/>
+                </td>
+              </tr>
+            </table>
+            </div>
+  </form>
+  </div>
+</div>
+</div>
+<nav class="navbar navbar-default" style="position: absolute;left: 50%;margin-left: width/2;">
+  <style type="text/css">
+    .submit{
+      background-color: #4CAF50;
+      color: white;
+    }
+  </style>
+  <!-- <form id="instructor" action="Instructor.html" > -->
+  <div class="container-fluid" >
+     <ul class="nav navbar-nav">
+      <li><button type="submit" class="btn btn-default submit" ng-click="submitCourse()" >Submit</button></li>
+    </ul>
+  </div>
+ <!--   </form> -->
+</nav>
+
+</body>
+<script>
+
+var myapp = angular.module('myApp', []);
+//alert(sessionStorage.userid);
+var userid = sessionStorage.userid;
+myapp.controller('mainController', function ($scope,$http,$window) {
+//exam section
+$scope.exam_typeList = [
+     { TypeId: 0, Name: 'Quiz' },
+     { TypeId: 1, Name: 'Midterm' },
+     { TypeId: 2, Name: 'Final' }
+     ];
+$scope.course = {
+    userid:userid,
+    exams:[],
+    assignments:[],
+    times:[]
+}
+$scope.newExam ={
+    examType : "",
+    order: "",
+    date : "",
+    startTime: "",
+    endTime: "",
+    examlocation: "",
+    description: ""
+}  
+$scope.newAssign = {
+    assignmentType: '',
+    order:"",
+    date : '',
+    description : ''
+}
+$scope.newTime = {
+    day:"",
+    startTime: "",
+    endTime:"",
+    location:""
+}  
+
+$scope.addExam = function(){
+    $scope.course.exams.push({ 'examType':$scope.newExam.examType,'order':$scope.newExam.order, 'date': $scope.newExam.date, 'startTime': $scope.newExam.startTime, 'endTime': $scope.newExam.endTime, 'examlocation':$scope.newExam.examlocation, 'description': $scope.newExam.description });
+   
+};
+$scope.removeExam = function(date){              
+    var index = -1;     
+    var comArr = eval( $scope.course.exams );
+    for( var i = 0; i < comArr.length; i++ ) {
+        if( comArr[i].date === date ) {
+            index = i;
+            break;
+        }
+    }
+    if( index === -1 ) {
+        alert( "Something gone wrong" );
+    }
+    $scope.course.exams.splice( index, 1 );        
+};
+
+//assignment section
+
+$scope.addAssign = function(){ 
+    $scope.course.assignments.push({ 'assignmentType':$scope.newAssign.assignmentType,'order':$scope.newAssign.order, 'date': $scope.newAssign.date, 'description': $scope.newAssign.description });
+
+};
+$scope.removeAssign = function(date){              
+        var index = -1;     
+        var comArr = eval( $scope.course.assignments );
+        for( var i = 0; i < comArr.length; i++ ) {
+            if( comArr[i].date === date ) {
+                index = i;
+                break;
+            }
+        }
+        if( index === -1 ) {
+            alert( "Something gone wrong" );
+        }
+        $scope.course.assignments.splice( index, 1 );      
+    };
+
+//basic info section
+
+ $scope.typeList = [
+     { TypeId: 0, Name: 'Student' },
+     { TypeId: 1, Name: 'Teacher Assistant' },
+     { TypeId: 2, Name: 'Professor' }
+     ];
+
+$scope.addDay = function(){ 
+    
+  $scope.course.times.push({ 'day':$scope.newTime.day,'location':$scope.newTime.location,  'startTime': $scope.newTime.startTime, 'endTime': $scope.newTime.endTime });
+    
+    console.log($scope.course.times);
+};
+$scope.removeDay = function(day){       
+    var index = -1;   
+    var comArr = eval( $scope.course.times );
+    for( var i = 0; i < comArr.length; i++ ) {
+      if( comArr[i].day === day ) {
+        index = i;
+        break;
+      }
+    }
+    if( index === -1 ) {
+      alert( "Something gone wrong" );
+    }
+    $scope.course.times.splice( index, 1 );   
+  };
+
+$scope.submitCourse = function() {
+    console.log($scope.course);
+    $http.post('http://localhost:8000/user/create', $scope.course)
+        .then(
+          //login success
+        function(response){
+            console.log(response.data);
+            if (response.data.result == "success"){
+              $window.location.href="http://localhost:8000/enroll";
+                //alert("Creation successful");
+                // $scope.userid = response.data.userid;
+            }else {
+                alert(response.data.reason);
+            }
+        },
+        //login fail
+        function(){
+            alert("send failure");
+        });
+    
+    }
+
+});
+// $scope.submitForm = function () {
+     
+//      // Set the 'submitted' flag to true
+//      $scope.submitted = true;
+//      $scope.userid = {};
+     
+//      if ($scope.userForm.$valid) {
+    //  $scope.try_reg = function() {
+    //     console.log($scope.user);
+    //   $http.post('http://localhost:8000/create', $scope.user)
+    //     .then(
+    //       //login success
+    //       function(response){
+    //             console.log(response.data);
+    //             if (response.data.result == "success"){
+    //                 alert("login successful");
+    //                 $scope.userid = response.data.userid;
+    //             }else {
+    //                 alert(response.data.reason);
+    //             }
+    //       },
+    //       //login fail
+    //       function(){
+    //         alert("send failure");
+    //       }
+    //   );
+    // }
+     //}
+//      else {
+//      alert("Please correct errors!");
+//      }
+//      };
+// });
+
+myapp.directive('ngCompare', function () {
+     return {
+     require: 'ngModel',
+     link: function (scope, currentEl, attrs, ctrl) {
+     var comparefield = document.getElementsByName(attrs.ngCompare)[0]; //getting first element
+     compareEl = angular.element(comparefield);
+     
+     //current field key up
+     currentEl.on('keyup', function () {
+     if (compareEl.val() != "") {
+     var isMatch = currentEl.val() === compareEl.val();
+     ctrl.$setValidity('compare', isMatch);
+     scope.$digest();
+     }
+     });
+     
+     //Element to compare field key up
+     compareEl.on('keyup', function () {
+     if (currentEl.val() != "") {
+     var isMatch = currentEl.val() === compareEl.val();
+     ctrl.$setValidity('compare', isMatch);
+     scope.$digest();
+     }
+     });
+     }
+     }
+    });
+
+
+</script>
+
+</html>

@@ -1,0 +1,132 @@
+<html lang="en-us">
+
+<head>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+  <style type="text/css">
+    .submit{
+      background-color: #4CAF50;
+      color: white;
+    }
+    .cancel{
+      background-color: #f44336;
+      color: white;
+    }
+  </style>
+</head>
+<body  ng-app="myapp" ng-controller="mainController">
+<div class="panel panel-info">
+    <div align="center" class="panel-heading">Welcome to Sylendar</div>
+
+    <div class="tab-content">
+      <form name="userForm" novalidate>
+        
+      <div id="home" >
+        <h3 align="center">Login</h3>
+        <form id="studentLogin" class="form-horizontal">
+          <div class="form-group">
+             <label>Login Type:</label><br>
+            <input type="radio" name="isProf" ng-model="user.isProf" value="0" ng-checked="true"> Student
+            <input type="radio" name="isProf" ng-model="user.isProf" value="1"> Professor
+          </div>
+          <div class="form-group" ng-class="{ 'has-error' : userForm.email.$invalid && (userForm.email.$dirty || submitted)}">
+             <label>Email:</label>
+             <input type="email" name="email" class="form-control" ng-model="user.email" placeholder="Your Email Address" ng-required="true">
+<!--              <p ng-show="userForm.email.$error.required && (userForm.email.$dirty || submitted)" class="help-block">Email is required.</p>
+             <p ng-show="userForm.email.$error.email && (userForm.email.$dirty || submitted)" class="help-block">Enter a valid email.</p> -->
+           </div>
+          <div class="form-group" ng-class="{ 'has-error' : userForm.password.$invalid && (userForm.password.$dirty || submitted)}">
+             <label>Password:</label>
+             <input type="Password" name="password" class="form-control" ng-model="user.password" placeholder="Your Password" ng-required="true">
+<!--              <p ng-show="userForm.password.$error.required && (userForm.password.$dirty || submitted)" class="help-block">Your password is required.</p> -->
+           </div>
+          <div class="form-group">
+            <div class="col-sm-offset-4 col-sm-10">
+              <button ng-click="try_reg(user)" class="btn btn-default submit">Login</button>
+              <button type="button" class="btn btn-info" onclick="location.href='http://localhost:8000/registrate';">Sign Up</button>
+            </div>
+          </div>
+        </form>
+      </div>
+      </form>
+    </div>
+</div>
+
+</body>
+</html>
+<script>
+    
+    //defining module
+    var myapp = angular.module('myapp', []);
+     
+    //creating custom directive
+    myapp.directive('ngCompare', function () {
+     return {
+     require: 'ngModel',
+     link: function (scope, currentEl, attrs, ctrl) {
+     var comparefield = document.getElementsByName(attrs.ngCompare)[0]; //getting first element
+     compareEl = angular.element(comparefield);
+     
+     //current field key up
+     currentEl.on('keyup', function () {
+     if (compareEl.val() != "") {
+     var isMatch = currentEl.val() === compareEl.val();
+     ctrl.$setValidity('compare', isMatch);
+     scope.$digest();
+     }
+     });
+     
+     //Element to compare field key up
+     compareEl.on('keyup', function () {
+     if (currentEl.val() != "") {
+     var isMatch = currentEl.val() === compareEl.val();
+     ctrl.$setValidity('compare', isMatch);
+     scope.$digest();
+     }
+     });
+     }
+     }
+    });
+     
+    // create angular controller
+    myapp.controller('mainController', function ($scope,$http,$window) {
+     
+     // Set the 'submitted' flag to true
+     $scope.submitted = true;
+     $scope.userid = {};
+     $scope.user = {
+        isProf: '0',
+     }
+     
+
+     $scope.try_reg = function() {
+        console.log($scope.user);
+      $http.post('http://localhost:8000/auth/login', $scope.user)
+        .then(
+          //login success
+          function(response){
+                console.log(response.data);
+                if (response.data.result == "success"){
+                    $scope.userid = response.data.userid;
+                    sessionStorage.userid = response.data.userid;
+                    console.log(response.data.firstname);
+                    sessionStorage.firstname = response.data.firstname;
+                    sessionStorage.lastname = response.data.lastname;
+                    $window.location.href='http://localhost:8000/enroll';
+                    
+                }else {
+                    alert(response.data.reason);
+                }
+          },
+          //login fail
+          function(){
+            alert("send failure");
+          }
+      );
+    }
+
+  
+    });
+</script>

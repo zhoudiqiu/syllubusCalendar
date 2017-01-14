@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<!-- HTML5 Hello world by kirupa - http://www.kirupa.com/html5/getting_your_feet_wet_html5_pg1.htm -->
+<html lang="en-us">
+
+<head>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+	<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="">Syllabus Calendar</a>
+    </div>
+     <ul class="nav navbar-nav">
+      <li><a href="#" id="name"></a></li>
+    </ul>
+	<ul class="nav navbar-nav navbar-right">
+	  <li><a href="#"><span class="glyphicon glyphicon-home"></span> Washington University in St Louis</a></li>
+      <li><a href="#"><span class="glyphicon glyphicon-user"></span> My Profile</a></li>
+      <li><a href="http://localhost:8000/"><span class="glyphicon glyphicon-log-in"></span> Log Out</a></li>
+    </ul>
+  </div>
+  <ul class="nav nav-tabs  nav-justified">
+      <li class="active"><a data-toggle="tab" href="#home">Search Courses</a></li>
+      <li><a data-toggle="tab" href="#home2">Enrolled Courses</a></li>
+      <li><a data-toggle="tab" href="#home3">Create Course Calendar</a></li>
+    </ul>
+</nav>
+<div class="tab-content">
+	<div id="home" class="tab-pane fade in active">
+        <div class="panel panel-info" ng-app="searchApp" ng-controller="CourseCtrl">
+			<div class="panel-heading">Search for new course</div>
+			<div class="panel-body">
+				<div class="form-group row">
+				<input type="input" class="form-control col-md-9" placeholder="Search by course number or name" ng-model="searchString"/>
+				<button id="search" type="button" class="btn btn-info col-md-2" ng-click="searchCourse()" >Search</button>
+				</div>
+				<table id="item" class="form-group table-bordered">
+					<tr class="row">
+						<th class="col-md-2">Course #</th>
+						<th class="col-md-5">Course Title</th>
+						<th class="col-md-2">Instructor</th>
+						<th class="col-md-2">Enroll #</th>
+						<th class="col-md-3">Action</th>
+					</tr>
+					<tr class="row" ng-repeat="x in courses">
+					    <td class="col-md-2">{{! x.CourseNumber }}</td>
+					    <td class="col-md-5">{{! x.CourseName }}</td>
+					    <td class="col-md-2">{{! x.Instructor }}</td>
+					    <td class="col-md-2">{{! x.EnrollNum }}</td>
+					    <td class="col-md-3">
+							<button id="test" ng-click="show_url()">Add to Calender</button>
+						</td>
+					 </tr>
+				</table>
+			</div>
+		</div>
+	</div>
+	<div id="home2" class="tab-pane fade">
+		<div class="panel panel-info" ng-app="removeApp" ng-controller="RemoveCtrl">
+			<div class="panel-heading">Added Courses</div>
+			<div class="panel-body">
+				<table class="form-group table-bordered">
+					<tr class="row">
+						<th class="col-md-2">Course #</th>
+						<th class="col-md-5">Course Title</th>
+						<th class="col-md-2">Instructor</th>
+						<th class="col-md-3">Enrolled #</th>
+						<th class="col-md-3">Access Level</th>
+						<th class="col-md-3">Course Page</th>
+						<th class="col-md-3">Action</th>
+					</tr>
+					<tr class="row" ng-repeat="y in rcourses">
+					    <td class="col-md-2">{{! y.CourseNum }}</td>
+					    <td class="col-md-5">{{! y.CourseName }}</td>
+					    <td class="col-md-2">{{! y.Instructor }}</td>
+					    <td class="col-md-2">{{! y.EnrollNum }}</td>
+					    <td class="col-md-2">{{! y.AccessLvl }}</td>
+					    <td class="col-md-3">
+						<button type="button" class="btn btn-info" ng-click="goToCourse(y)">Go to Course Page</button>
+						</td>
+						<td class="col-md-3">
+							<button ng-click="removeRow(y.CourseNum)">Remove from Calender</button>
+						</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+	<div id="home3" class="tab-pane fade"  >
+         <div class="panel panel-info">
+			<div class="panel-heading">Add Calendar</div>
+			
+			<button class="btn btn-info col-md-2 text-center center-block" onclick="location.href='http://localhost:8000/createNew'">Create New Calendar</button>
+			
+		</div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+document.getElementById("name").innerHTML = "Hi " + sessionStorage.firstname +" "+ sessionStorage.lastname;
+var searchApp = angular.module("searchApp", []);
+searchApp.controller("CourseCtrl", function($scope,$http) {
+$scope.userid = {
+	'userid': sessionStorage.userid,
+};
+$scope.courses = [];
+$scope.url = {};
+$scope.show_url = function(){
+	var data = {
+		'userid': sessionStorage.userid,
+		'className':$scope.courses[0].CourseName,
+		'isProf':'0'
+	}
+	$http.put('http://localhost:8000/user/enroll',data)
+	.then(
+		function(response){
+			if (response.data.result == "success"){
+				alert(response.data.url);
+			}else {
+				alert(response.data.reason);
+			}
+			console.log(response.data);
+			//alert($scope.url);
+		},
+	
+		function(){
+			alert("Enroll Failure");
+		}
+	);
+}
+$scope.searchCourse = function(){
+	var str = {
+		courseName:$scope.searchString
+	};
+	$http.post('http://localhost:8000/search',str)
+	.then(
+          //login success
+          function(response){
+          	if (response.data.result == "success"){
+          		if (response.data.count == 1){
+	          		$scope.courses.push(response.data.data);
+	          	}else {
+	          		for( res in response.data.data){
+		          		console.log(res);
+		          		$scope.courses.push(res);
+		          	}
+	          	}
+	          }else {
+	          	alert("Class Not Found");
+	          }
+          	
+          	
+            console.log(response.data);
+          },
+          //login fail
+          function(){
+            alert("Send Failure");
+          }
+    );
+};
+
+});
+angular.bootstrap(document.getElementById("home"), ['searchApp']);
+//----------------------------------------------
+var removeApp = angular.module("removeApp", []);
+removeApp.controller("RemoveCtrl", function($scope,$http,$window) {
+$scope.userid = {
+	'userid': sessionStorage.userid,
+};
+$scope.rcourses = [];
+ $scope.addRow = function(){		
+	$scope.rcourses.push({ 'CourseNum':$scope.CourseNum,  'CourseName': $scope.CourseName, 'Instructor': $scope.Instructor });
+	$scope.CourseNum='';
+	$scope.CourseName= '';
+	$scope.Instuctor= '';
+};
+$scope.removeRow = function(CourseNum){			
+		var index = -1;		
+		var comArr = eval( $scope.rcourses );
+		for( var i = 0; i < comArr.length; i++ ) {
+			if( comArr[i].CourseNum === CourseNum ) {
+				index = i;
+				alert( index);
+				break;
+			}
+		}
+		if( index === -1 ) {
+			alert( "Something gone wrong" );
+		}
+		$scope.infos.splice( index, 1 );		
+};
+var access =[ "Normal","Admin","Creator"];
+
+$scope.goToCourse = function(x){
+	console.log("got here");
+    sessionStorage.className = x.CourseName;
+	for (var i = 0; i < access.length;i++){
+		if (access[i] === x.AccessLvl){
+			sessionStorage.access = i;
+		}
+	}
+    $window.location.href='http://localhost:8000/course';
+}
+
+
+$http.put('http://localhost:8000/fetch',$scope.userid)
+	.then(
+		function(response){
+			if (response.data.result == "success"){
+				if (response.data.count == 1){
+					var course = response.data.data[0];
+					$scope.rcourses.push({'CourseNum':course[3],'CourseName':course[0],'Instructor':course[4],'EnrollNum':course[2],'AccessLvl':access[parseInt(course[1])]});
+				}else if (response.data.count > 1){
+					for (var i = 0; i < response.data.count ;i++){
+						var course = response.data.data[i];
+						$scope.rcourses.push({'CourseNum':course[3],'CourseName':course[0],'Instructor':course[4],'EnrollNum':course[2],'AccessLvl':access[parseInt(course[1])]});
+					}
+				}
+
+			}else {
+				alert(response.data.reason);
+			}
+			console.log(response.data);
+			//alert($scope.url);
+		},
+	
+		function(){
+			alert("get class Failure");
+		}
+	);
+
+});
+angular.bootstrap(document.getElementById("home2"), ['removeApp']); //For attaching second dynamic table to Remove Courses
+</script>

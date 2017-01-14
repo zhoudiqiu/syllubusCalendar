@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<!-- HTML5 Hello world by kirupa - http://www.kirupa.com/html5/getting_your_feet_wet_html5_pg1.htm -->
+<html lang="en-us">
+
+<head>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+	<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="">Syllabus Calendar</a>
+    </div>
+     <ul class="nav navbar-nav">
+      <li><a href="#">Student XXX</a></li>
+    </ul>
+	<ul class="nav navbar-nav navbar-right">
+	  <li><a href="#"><span class="glyphicon glyphicon-home"></span> Washington University in St Louis</a></li>
+      <li><a href="#"><span class="glyphicon glyphicon-user"></span> My Profile</a></li>
+      <li><a href="Welcome.html"><span class="glyphicon glyphicon-log-in"></span> Log Out</a></li>
+    </ul>
+  </div>
+  <ul class="nav nav-tabs  nav-justified">
+      <li class="active"><a data-toggle="tab" href="#home">Search Courses</a></li>
+      <li><a data-toggle="tab" href="#home2">Enrolled Courses</a></li>
+      <li><a data-toggle="tab" href="#home3">Create Course Calendar</a></li>
+    </ul>
+</nav>
+<div class="tab-content">
+	<div id="home" class="tab-pane fade in active">
+        <div class="panel panel-info" ng-app="searchApp" ng-controller="CourseCtrl">
+			<div class="panel-heading">Search for new course</div>
+			<div class="panel-body">
+				<div class="form-group row">
+				<input type="input" class="form-control col-md-9" placeholder="Search by course number or name"/>
+				<button class="btn btn-info col-md-2" >Search</button>
+				</div>
+				<table class="form-group table-bordered">
+					<tr class="row">
+						<th class="col-md-2">Course #</th>
+						<th class="col-md-5">Course Title</th>
+						<th class="col-md-2">Instructor</th>
+						<th class="col-md-3">Action</th>
+					</tr>
+					<tr class="row" ng-repeat="x in courses">
+					    <td class="col-md-2">{{! x.CourseNum }}</td>
+					    <td class="col-md-5">{{! x.CourseName }}</td>
+					    <td class="col-md-2">{{! x.Instructor }}</td>
+					    <td class="col-md-3">
+							<Button id="test">Add to Calender</Button>
+						</td>
+					 </tr>
+				</table>
+			</div>
+		</div>
+	</div>
+	<div id="home2" class="tab-pane fade">
+		<div class="panel panel-info" ng-app="removeApp" ng-controller="RemoveCtrl">
+			<div class="panel-heading">Added Courses</div>
+			<div class="panel-body">
+				<table class="form-group table-bordered">
+					<tr class="row">
+						<th class="col-md-2">Course #</th>
+						<th class="col-md-5">Course Title</th>
+						<th class="col-md-2">Instructor</th>
+						<th class="col-md-3">Action</th>
+					</tr>
+					<tr class="row" ng-repeat="y in rcourses">
+					    <td class="col-md-2">{{! y.CourseNum }}</td>
+					    <td class="col-md-5">{{! y.CourseName }}</td>
+					    <td class="col-md-2">{{! y.Instructor }}</td>
+						<td class="col-md-3">
+							<Buttono>Remove from Calender</Button>
+						</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+	<div id="home3" class="tab-pane fade"  >
+         <div class="panel panel-info">
+			<div class="panel-heading">Add Calendar</div>
+			<a href="Event.html">
+			<button class="btn btn-info col-md-2 text-center center-block">Create New Calendar</button>
+			</a> 
+		</div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+	var searchApp = angular.module("searchApp", []);
+searchApp.controller("CourseCtrl", function($scope) {
+$scope.courses = [
+                    { 'CourseNum':'CSE 131',
+                    	'CourseName': 'Computer Science I',
+                    	'Instructor': 'Douglas Shook'},
+                    	{ 'CourseNum':'CSE132',
+	                    	'CourseName': 'Computer Science II',
+	                    	'Instructor': 'Douglas Shook'},
+	              
+                    ];
+
+});
+angular.bootstrap(document.getElementById("home"), ['searchApp']);
+//----------------------------------------------
+	var removeApp = angular.module("removeApp", []);
+removeApp.controller("RemoveCtrl", function($scope) {
+$scope.rcourses = [
+                    { 'CourseNum':'CSE 541T',
+                    	'CourseName': 'Advanced Algorithm',
+                    	'Instructor': 'Jeremy Buhler'},
+                    	{ 'CourseNum':'	CSE417T',
+	                    	'CourseName': 'Machine Learning',
+	                    	'Instructor': 'Sammy Das&Marion Neumann'},
+	              
+                    ];
+});
+angular.bootstrap(document.getElementById("home2"), ['removeApp']); //For attaching second dynamic table to Remove Courses
+</script>
